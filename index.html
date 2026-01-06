@@ -3,137 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hot Wheels Elite - Регистрация</title>
+    <title>Hot Wheels Elite</title>
     <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    <div class="container">
-        <!-- Экран приветствия/регистрации -->
-        <div id="welcome-screen" class="screen active">
-            <div class="welcome-header">
-                <div class="logo">
-                    <div class="logo-icon">🏎️</div>
-                    <span>Hot Wheels Elite</span>
-                </div>
+    <!-- Экран авторизации -->
+    <div id="auth-screen" class="screen active">
+        <div class="auth-container">
+            <div class="logo-big">
+                <div class="logo-icon">🏎️</div>
+                <h1>Hot Wheels Elite</h1>
             </div>
             
-            <div class="welcome-content">
-                <h1>Добро пожаловать!</h1>
-                <p>Крупнейшее сообщество коллекционеров Hot Wheels в России</p>
+            <div class="auth-card">
+                <h2>Вход через Telegram</h2>
+                <p>Для использования приложения войдите через свой Telegram аккаунт</p>
                 
-                <div class="features">
-                    <div class="feature">
-                        <div class="feature-icon">🚀</div>
-                        <span>Быстрая регистрация</span>
-                    </div>
-                    <div class="feature">
-                        <div class="feature-icon">🛡️</div>
-                        <span>Безопасные сделки</span>
-                    </div>
-                    <div class="feature">
-                        <div class="feature-icon">⭐</div>
-                        <span>Эксклюзивные модели</span>
-                    </div>
-                </div>
-                
-                <button id="telegram-auth-btn" class="auth-btn telegram-btn">
-                    <div class="btn-content">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.141c-.174-.807-.996-1.384-1.768-1.188-3.037.585-6.217.88-9.474.979-.388.019-.695.312-.715.701-.02.389.274.718.662.737 3.182.098 6.287.386 9.251.954.164.032.332-.024.45-.147.119-.123.174-.296.147-.462-.155-.695-.306-1.39-.453-2.086zm-.674 2.1c-.723.173-1.456.328-2.196.465-.364.068-.712-.183-.78-.547-.068-.364.183-.712.547-.78.731-.137 1.455-.291 2.171-.463.374-.089.758.13.847.504.089.374-.13.758-.504.847-.073.017-.147.025-.22.025-.303 0-.58-.205-.665-.511z"/>
-                        </svg>
-                        <span>Войти через Telegram</span>
-                    </div>
+                <button id="tg-login-btn" class="tg-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                        <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.141c-.174-.807-.996-1.384-1.768-1.188-3.037.585-6.217.88-9.474.979-.388.019-.695.312-.715.701-.02.389.274.718.662.737 3.182.098 6.287.386 9.251.954.164.032.332-.024.45-.147.119-.123.174-.296.147-.462-.155-.695-.306-1.39-.453-2.086zm-.674 2.1c-.723.173-1.456.328-2.196.465-.364.068-.712-.183-.78-.547-.068-.364.183-.712.547-.78.731-.137 1.455-.291 2.171-.463.374-.089.758.13.847.504.089.374-.13.758-.504.847-.073.017-.147.025-.22.025-.303 0-.58-.205-.665-.511z"/>
+                    </svg>
+                    Войти через Telegram
                 </button>
                 
-                <div class="terms">
-                    Нажимая кнопку, вы соглашаетесь с 
-                    <a href="#">Пользовательским соглашением</a> и 
-                    <a href="#">Политикой конфиденциальности</a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Основной интерфейс (скрыт до регистрации) -->
-        <div id="main-screen" class="screen">
-            <div class="header">
-                <div class="logo">
-                    <div class="logo-icon">🏎️</div>
-                    <span>Hot Wheels Elite</span>
-                </div>
-                <div id="user-profile" class="profile-icon"></div>
-            </div>
-
-            <div class="category-tabs">
-                <div class="tab active">Все</div>
-                <div class="tab">Коллекционные</div>
-                <div class="tab">Редкие</div>
-                <div class="tab">Треки</div>
-                <div class="tab">Распродажа</div>
-                <div class="tab">Кастом</div>
-            </div>
-
-            <div class="product-grid">
-                <!-- Товары будут загружаться через JS -->
-            </div>
-
-            <div class="nav-bar">
-                <div class="nav-item active">
-                    <div class="nav-icon">🏠</div>
-                    <span>Главная</span>
-                </div>
-                <div class="nav-item">
-                    <div class="nav-icon">🔍</div>
-                    <span>Поиск</span>
-                </div>
-                <div class="nav-item">
-                    <div class="nav-icon">➕</div>
-                    <span>Продать</span>
-                </div>
-                <div class="nav-item">
-                    <div class="nav-icon">❤️</div>
-                    <span>Избранное</span>
-                </div>
-                <div class="nav-item">
-                    <div class="nav-icon">👤</div>
-                    <span>Профиль</span>
+                <div class="auth-hint">
+                    Бот для входа: <strong>@HotWheelsEliteBot</strong>
                 </div>
             </div>
         </div>
     </div>
 
-    <script>
-        // Инициализация Telegram Web App
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.enableClosingConfirmation();
-        
-        // Если пользователь уже авторизован в Telegram
-        if (tg.initDataUnsafe.user) {
-            const user = tg.initDataUnsafe.user;
-            document.getElementById('user-profile').textContent = 
-                user.first_name ? user.first_name[0] : 'TG';
-            
-            // Переключаем на основной экран
-            document.getElementById('welcome-screen').classList.remove('active');
-            document.getElementById('main-screen').classList.add('active');
-            
-            // Отправляем данные на сервер для регистрации
-            fetch('/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    telegram_id: user.id,
-                    username: user.username,
-                    first_name: user.first_name,
-                    last_name: user.last_name,
-                    language_code: user.language_code
-                })
-            });
-        }
-    </script>
+    <!-- Основной экран -->
+    <div id="app-screen" class="screen">
+        <!-- Шапка -->
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">🏎️</div>
+                <span id="app-title">Главная</span>
+            </div>
+            <div id="user-avatar" class="profile-icon" onclick="showProfile()">?</div>
+        </div>
+
+        <!-- Контент -->
+        <div id="content">
+            <!-- Главная -->
+            <div id="home-content" class="content-page active">
+                <div class="category-tabs">
+                    <div class="tab active">Все</div>
+                    <div class="tab">Коллекционные</div>
+                    <div class="tab">Редкие</div>
+                    <div class="tab">Треки</div>
+                    <div class="tab">Распродажа</div>
+                </div>
+
+                <div class="product-grid">
+                    <!-- Товары загружаются через JS -->
+                </div>
+            </div>
+
+            <!-- Поиск -->
+            <div id="search-content" class="content-page">
+                <div class="search-box">
+                    <input type="text" placeholder="Поиск моделей..." class="search-input">
+                    <div class="search-btn">🔍</div>
+                </div>
+                <div class="search-results"></div>
+            </div>
+
+            <!-- Продать -->
+            <div id="sell-content" class="content-page">
+                <div class="sell-container">
+                    <h3>Продать модель</h3>
+                    <input type="text" placeholder="Название модели" class="form-input">
+                    <input type="number" placeholder="Цена (₽)" class="form-input">
+                    <textarea placeholder="Описание" class="form-textarea"></textarea>
+                    <button class="btn-primary">Выложить на продажу</button>
+                </div>
+            </div>
+
+            <!-- Избранное -->
+            <div id="favorites-content" class="content-page">
+                <div class="empty-state">
+                    <div class="empty-icon">❤️</div>
+                    <h4>Нет избранного</h4>
+                    <p>Добавляйте понравившиеся модели в избранное</p>
+                </div>
+            </div>
+
+            <!-- Профиль -->
+            <div id="profile-content" class="content-page">
+                <div class="profile-header">
+                    <div id="profile-avatar" class="big-avatar">?</div>
+                    <div class="profile-info">
+                        <h3 id="profile-name">Пользователь</h3>
+                        <div class="profile-stats">
+                            <div class="stat">
+                                <div class="stat-number" id="reviews-count">0</div>
+                                <div class="stat-label">Отзывы</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number" id="products-count">0</div>
+                                <div class="stat-label">Товары</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number" id="rating-value">0.0</div>
+                                <div class="stat-label">Рейтинг</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Мои товары -->
+                <div class="profile-section">
+                    <h4>Мои товары</h4>
+                    <div id="my-products" class="products-list">
+                        <!-- Товары пользователя -->
+                    </div>
+                </div>
+
+                <!-- Отзывы -->
+                <div class="profile-section">
+                    <h4>Отзывы <span class="reviews-count">(0)</span></h4>
+                    <div id="reviews-list" class="reviews-container">
+                        <!-- Отзывы -->
+                    </div>
+                </div>
+
+                <div class="profile-actions">
+                    <button class="btn-secondary" onclick="editProfile()">✏️ Редактировать</button>
+                    <button class="btn-logout" onclick="logout()">🚪 Выйти</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Нижнее меню -->
+        <div class="nav-bar">
+            <div class="nav-item active" data-page="home">
+                <div class="nav-icon">🏠</div>
+                <span>Главная</span>
+            </div>
+            <div class="nav-item" data-page="search">
+                <div class="nav-icon">🔍</div>
+                <span>Поиск</span>
+            </div>
+            <div class="nav-item" data-page="sell">
+                <div class="nav-icon">➕</div>
+                <span>Продать</span>
+            </div>
+            <div class="nav-item" data-page="favorites">
+                <div class="nav-icon">❤️</div>
+                <span>Избранное</span>
+            </div>
+            <div class="nav-item" data-page="profile">
+                <div class="nav-icon">👤</div>
+                <span>Профиль</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Попап редактирования профиля -->
+    <div id="edit-profile-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Редактировать профиль</h3>
+                <span class="close-modal" onclick="closeModal()">×</span>
+            </div>
+            <input type="text" id="edit-name" placeholder="Имя" class="form-input">
+            <input type="text" id="edit-username" placeholder="Username" class="form-input">
+            <button class="btn-primary" onclick="saveProfile()">Сохранить</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
 </body>
 </html>
