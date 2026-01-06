@@ -28,7 +28,7 @@
                 </button>
                 
                 <div class="auth-hint">
-                    <a href="#" onclick="showDemo()">Попробовать демо-версию</a>
+                    <a href="#" onclick="App.showDemo()">Попробовать демо-версию</a>
                 </div>
             </div>
         </div>
@@ -80,28 +80,27 @@
                     <!-- Фото -->
                     <div class="photos-upload">
                         <h4>Фотографии (до 3 шт.)</h4>
-                        <div class="photos-grid">
+                        <div class="photos-grid" id="photos-grid">
                             <div class="photo-upload-box" onclick="document.getElementById('photo-input').click()">
                                 <div class="upload-icon">📷</div>
                                 <span>Добавить фото</span>
                             </div>
-                            <div class="photo-preview"></div>
-                            <div class="photo-preview"></div>
                         </div>
                         <input type="file" id="photo-input" accept="image/*" multiple style="display: none;">
+                        <div class="upload-hint">Файлы сохраняются в браузере</div>
                     </div>
 
                     <!-- Основная информация -->
                     <div class="form-group">
                         <h4>Основная информация</h4>
-                        <input type="text" id="product-title" placeholder="Название модели" class="form-input" required>
+                        <input type="text" id="product-title" placeholder="Название модели*" class="form-input" required>
                         <textarea id="product-description" placeholder="Описание" class="form-textarea"></textarea>
-                        <input type="number" id="product-price" placeholder="Цена (₽)" class="form-input" required>
+                        <input type="number" id="product-price" placeholder="Цена (₽)*" class="form-input" required>
                     </div>
 
                     <!-- Категория -->
                     <div class="form-group">
-                        <h4>Категория редкости</h4>
+                        <h4>Категория редкости*</h4>
                         <div class="rarity-grid">
                             <div class="rarity-item active" data-rarity="main">
                                 <div class="rarity-icon">🚗</div>
@@ -132,7 +131,7 @@
 
                     <!-- Состояние -->
                     <div class="form-group">
-                        <h4>Состояние</h4>
+                        <h4>Состояние*</h4>
                         <div class="condition-buttons">
                             <button class="condition-btn active" data-condition="new">Новый</button>
                             <button class="condition-btn" data-condition="like_new">Как новый</button>
@@ -144,17 +143,16 @@
                     <!-- Контакты -->
                     <div class="form-group">
                         <h4>Контакты</h4>
-                        <input type="text" id="contact-city" placeholder="Город" class="form-input">
-                        <input type="tel" id="contact-phone" placeholder="Телефон (опционально)" class="form-input">
+                        <input type="text" id="contact-city" placeholder="Город*" class="form-input" required>
                         <input type="text" id="contact-telegram" placeholder="@username в Telegram" class="form-input">
                     </div>
 
                     <!-- Кнопка публикации -->
-                    <button class="btn-primary" onclick="App.publishProduct()">Опубликовать</button>
+                    <button class="btn-primary" onclick="App.publishProduct()">📤 Опубликовать</button>
                     
                     <div class="sell-note">
-                        После публикации объявление появится в общем каталоге. 
-                        Вы сможете редактировать его в своем профиле.
+                        * — обязательные поля<br>
+                        После публикации объявление появится в общем каталоге.
                     </div>
                 </div>
             </div>
@@ -244,27 +242,69 @@
                     <div class="slider-main">
                         <img id="modal-main-image" src="" alt="">
                     </div>
-                    <div class="slider-thumbs">
+                    <div class="slider-thumbs" id="modal-thumbs">
                         <!-- Миниатюры -->
                     </div>
                 </div>
                 <div class="product-details">
                     <div class="product-price-large" id="modal-product-price"></div>
-                    <div class="product-rarity" id="modal-product-rarity"></div>
-                    <div class="product-condition" id="modal-product-condition"></div>
+                    <div class="product-tags">
+                        <span class="product-rarity" id="modal-product-rarity"></span>
+                        <span class="product-condition" id="modal-product-condition"></span>
+                    </div>
                     <div class="product-description" id="modal-product-description"></div>
+                    
+                    <div class="product-share">
+                        <button class="btn-share" onclick="App.shareProduct()">🔗 Поделиться ссылкой</button>
+                        <input type="text" id="product-link" readonly style="display: none;">
+                    </div>
+                    
                     <div class="product-seller">
                         <div class="seller-avatar" id="modal-seller-avatar"></div>
                         <div class="seller-info">
                             <div class="seller-name" id="modal-seller-name"></div>
                             <div class="seller-city" id="modal-seller-city"></div>
+                            <div class="seller-telegram" id="modal-seller-telegram"></div>
                         </div>
                     </div>
+                    
                     <div class="product-actions">
                         <button class="btn-contact" onclick="App.contactSeller()">📞 Связаться</button>
-                        <button class="btn-favorite" onclick="App.toggleFavorite()">❤️ В избранное</button>
+                        <button class="btn-favorite" id="modal-favorite-btn" onclick="App.toggleFavorite()">❤️ В избранное</button>
+                        <div class="owner-actions" id="owner-actions" style="display: none;">
+                            <button class="btn-edit" onclick="App.editProduct()">✏️ Редактировать</button>
+                            <button class="btn-delete" onclick="App.deleteProduct()">🗑️ Удалить</button>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Попап редактирования товара -->
+    <div id="edit-product-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Редактировать объявление</h3>
+                <span class="close-modal" onclick="App.closeEditModal()">×</span>
+            </div>
+            <input type="hidden" id="edit-product-id">
+            <input type="text" id="edit-title" placeholder="Название" class="form-input">
+            <textarea id="edit-description" placeholder="Описание" class="form-textarea"></textarea>
+            <input type="number" id="edit-price" placeholder="Цена (₽)" class="form-input">
+            <input type="text" id="edit-city" placeholder="Город" class="form-input">
+            
+            <div class="form-group">
+                <h4>Статус</h4>
+                <div class="status-buttons">
+                    <button class="status-btn active" data-status="active">Активно</button>
+                    <button class="status-btn" data-status="sold">Продано</button>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn-primary" onclick="App.saveProductChanges()">💾 Сохранить</button>
+                <button class="btn-secondary" onclick="App.closeEditModal()">❌ Отмена</button>
             </div>
         </div>
     </div>
@@ -277,7 +317,7 @@
                 <span class="close-modal" onclick="closeModal()">×</span>
             </div>
             <input type="text" id="edit-name" placeholder="Имя" class="form-input">
-            <input type="text" id="edit-username" placeholder="Username" class="form-input">
+            <input type="text" id="edit-username" placeholder="@username в Telegram" class="form-input">
             <input type="text" id="edit-city" placeholder="Город" class="form-input">
             <button class="btn-primary" onclick="saveProfile()">Сохранить</button>
         </div>
