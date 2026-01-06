@@ -254,7 +254,7 @@ body {
     text-transform: uppercase;
 }
 
-/* Страница продажи */
+/* Страница продажи - ФИКС РАСТЯГИВАНИЯ */
 .sell-container {
     padding: 20px;
 }
@@ -278,6 +278,7 @@ body {
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
     margin-bottom: 20px;
+    min-height: 100px; /* ФИКС: минимальная высота */
 }
 
 .photo-upload-box {
@@ -291,6 +292,7 @@ body {
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s;
+    flex-shrink: 0; /* ФИКС: не сжимается */
 }
 
 .photo-upload-box:hover {
@@ -303,21 +305,29 @@ body {
     margin-bottom: 8px;
 }
 
-.photo-preview {
+.upload-hint {
+    font-size: 12px;
+    color: #8b949e;
+    margin-top: 5px;
+    text-align: center;
+}
+
+.photo-preview-container {
+    position: relative;
     height: 100px;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 12px;
     overflow: hidden;
-    position: relative;
+    flex-shrink: 0; /* ФИКС: не сжимается */
 }
 
-.photo-preview img {
+.photo-preview-container img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.photo-preview .remove-photo {
+.remove-photo-btn {
     position: absolute;
     top: 5px;
     right: 5px;
@@ -376,6 +386,7 @@ body {
     text-align: center;
     cursor: pointer;
     transition: all 0.3s;
+    flex-shrink: 0; /* ФИКС: не сжимается */
 }
 
 .rarity-item.active {
@@ -416,6 +427,7 @@ body {
     cursor: pointer;
     white-space: nowrap;
     transition: all 0.3s;
+    flex-shrink: 0; /* ФИКС: не сжимается */
 }
 
 .condition-btn.active {
@@ -577,6 +589,49 @@ body {
     font-weight: bold;
 }
 
+/* Отзывы в профиле */
+.reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.review-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 15px;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.reviewer-name {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.review-date {
+    color: #8b949e;
+    font-size: 12px;
+}
+
+.review-rating {
+    color: #ffd700;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.review-text {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #ccc;
+}
+
 .profile-actions {
     padding: 20px;
     display: flex;
@@ -668,7 +723,7 @@ body {
 }
 
 .product-modal .modal-body {
-    max-height: 70vh;
+    max-height: 80vh;
     overflow-y: auto;
 }
 
@@ -705,10 +760,17 @@ body {
     border-radius: 8px;
     cursor: pointer;
     flex-shrink: 0;
+    overflow: hidden;
 }
 
 .thumb-item.active {
     border: 2px solid #00d4ff;
+}
+
+.thumb-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .product-details {
@@ -722,24 +784,63 @@ body {
     margin-bottom: 10px;
 }
 
+.product-tags {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
 .product-rarity, .product-condition {
     display: inline-block;
-    padding: 4px 12px;
-    background: rgba(0, 212, 255, 0.1);
-    color: #00d4ff;
+    padding: 6px 12px;
     border-radius: 20px;
     font-size: 12px;
     font-weight: 600;
-    margin-right: 10px;
-    margin-bottom: 10px;
+}
+
+.product-rarity {
+    background: rgba(0, 212, 255, 0.1);
+    color: #00d4ff;
+}
+
+.product-condition {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
 }
 
 .product-description {
     margin: 15px 0;
     line-height: 1.5;
     color: #ccc;
+    font-size: 14px;
 }
 
+/* Поделиться */
+.product-share {
+    margin: 15px 0;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    text-align: center;
+}
+
+.btn-share {
+    width: 100%;
+    padding: 12px;
+    background: rgba(147, 51, 234, 0.1);
+    border: 1px solid rgba(147, 51, 234, 0.3);
+    color: #9333ea;
+    border-radius: 12px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Продавец */
 .product-seller {
     display: flex;
     align-items: center;
@@ -760,6 +861,7 @@ body {
     justify-content: center;
     font-weight: bold;
     font-size: 20px;
+    flex-shrink: 0;
 }
 
 .seller-info {
@@ -769,16 +871,29 @@ body {
 .seller-name {
     font-weight: 600;
     margin-bottom: 5px;
+    font-size: 16px;
 }
 
-.seller-city {
+.seller-city, .seller-telegram {
     font-size: 14px;
     color: #8b949e;
+    margin-bottom: 3px;
+}
+
+.seller-telegram {
+    color: #00d4ff;
+}
+
+.seller-rating {
+    font-size: 14px;
+    color: #ffd700;
+    margin-top: 5px;
 }
 
 .product-actions {
     display: flex;
     gap: 10px;
+    margin-bottom: 20px;
 }
 
 .btn-contact {
@@ -812,157 +927,60 @@ body {
     gap: 8px;
 }
 
-/* Модальное окно */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
-    z-index: 1000;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
+.btn-favorite.favorited {
+    background: rgba(255, 107, 107, 0.3);
+    color: #ff4444;
 }
 
-.modal.active {
-    display: flex;
+/* Отзывы о продавце */
+.seller-reviews-section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.modal-content {
-    background: #1a1a1a;
-    border-radius: 20px;
-    padding: 25px;
-    width: 100%;
-    max-width: 400px;
+.seller-reviews-section h4 {
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.seller-review-item {
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    max-height: 90vh;
-    overflow-y: auto;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 10px;
 }
 
-.modal-header {
+.seller-review-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
-.modal-header h3 {
-    font-size: 20px;
+.seller-review-rating {
+    color: #ffd700;
+    font-size: 14px;
 }
 
-.close-modal {
-    font-size: 30px;
-    cursor: pointer;
-    color: #8b949e;
-    line-height: 1;
-}
-
-/* Нижнее меню */
-.nav-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(10, 10, 10, 0.95);
-    backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    justify-content: space-around;
-    padding: 10px 0;
-    max-width: 480px;
-    margin: 0 auto;
-    z-index: 1000;
-}
-
-.nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.seller-review-date {
     color: #8b949e;
     font-size: 12px;
-    transition: all 0.3s;
-    cursor: pointer;
-    padding: 8px 12px;
-    border-radius: 8px;
-    width: 60px;
 }
 
-.nav-item.active {
-    color: #00d4ff;
-    background: rgba(0, 212, 255, 0.1);
+.seller-review-text {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #ccc;
 }
 
-.nav-icon {
-    font-size: 22px;
-    margin-bottom: 4px;
-}
-
-/* Адаптив */
-@media (max-width: 400px) {
-    .product-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .profile-stats {
-        gap: 15px;
-    }
-    
-    .rarity-grid {
-        grid-template-columns: repeat(2, 1fr);
-        /* Добавить в конец файла */
-
-/* Загрузка фото */
-.upload-hint {
-    font-size: 12px;
-    color: #8b949e;
-    margin-top: 5px;
-    text-align: center;
-}
-
-/* Теги товара */
-.product-tags {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
-    flex-wrap: wrap;
-}
-
-.product-rarity, .product-condition {
-    display: inline-block;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.product-rarity {
-    background: rgba(0, 212, 255, 0.1);
-    color: #00d4ff;
-}
-
-.product-condition {
-    background: rgba(34, 197, 94, 0.1);
-    color: #22c55e;
-}
-
-/* Поделиться */
-.product-share {
-    margin: 15px 0;
-    padding: 15px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    text-align: center;
-}
-
-.btn-share {
+.btn-add-review {
     width: 100%;
     padding: 12px;
-    background: rgba(147, 51, 234, 0.1);
-    border: 1px solid rgba(147, 51, 234, 0.3);
-    color: #9333ea;
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: #22c55e;
     border-radius: 12px;
     font-size: 14px;
     cursor: pointer;
@@ -970,12 +988,37 @@ body {
     align-items: center;
     justify-content: center;
     gap: 8px;
+    margin-top: 10px;
 }
 
-.seller-telegram {
+/* Модалка отзыва */
+.rating-selector {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.stars {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin: 10px 0;
+    font-size: 32px;
+    cursor: pointer;
+}
+
+.star {
+    color: #666;
+    transition: color 0.2s;
+}
+
+.star.active {
+    color: #ffd700;
+}
+
+.rating-text {
+    color: #8b949e;
     font-size: 14px;
-    color: #00d4ff;
-    margin-top: 2px;
+    margin-top: 5px;
 }
 
 /* Действия владельца */
@@ -1066,34 +1109,92 @@ body {
     color: #ff4444;
 }
 
-/* Фото превью */
-.photo-preview-container {
-    position: relative;
-    border-radius: 12px;
-    overflow: hidden;
-}
-
-.photo-preview-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.remove-photo-btn {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    font-size: 14px;
-    cursor: pointer;
-    display: flex;
+/* Модальное окно */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
     align-items: center;
     justify-content: center;
+    padding: 20px;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: #1a1a1a;
+    border-radius: 20px;
+    padding: 25px;
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-header h3 {
+    font-size: 20px;
+}
+
+.close-modal {
+    font-size: 30px;
+    cursor: pointer;
+    color: #8b949e;
+    line-height: 1;
+}
+
+/* Нижнее меню */
+.nav-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(10, 10, 10, 0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    max-width: 480px;
+    margin: 0 auto;
+    z-index: 1000;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #8b949e;
+    font-size: 12px;
+    transition: all 0.3s;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 8px;
+    width: 60px;
+}
+
+.nav-item.active {
+    color: #00d4ff;
+    background: rgba(0, 212, 255, 0.1);
+}
+
+.nav-icon {
+    font-size: 22px;
+    margin-bottom: 4px;
 }
 
 /* Уведомление */
@@ -1108,6 +1209,11 @@ body {
     z-index: 2000;
     animation: slideIn 0.3s ease;
     max-width: 300px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.notification.error {
+    background: #ef4444;
 }
 
 @keyframes slideIn {
@@ -1120,5 +1226,26 @@ body {
         opacity: 1;
     }
 }
+
+/* Адаптив */
+@media (max-width: 400px) {
+    .product-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .profile-stats {
+        gap: 15px;
+    }
+    
+    .rarity-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .condition-buttons {
+        flex-wrap: wrap;
+    }
+    
+    .photos-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }

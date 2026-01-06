@@ -87,7 +87,7 @@
                             </div>
                         </div>
                         <input type="file" id="photo-input" accept="image/*" multiple style="display: none;">
-                        <div class="upload-hint">Файлы сохраняются в браузере</div>
+                        <div class="upload-hint">Файлы сохраняются локально</div>
                     </div>
 
                     <!-- Основная информация -->
@@ -183,8 +183,8 @@
                                 <div class="stat-label">Продано</div>
                             </div>
                             <div class="stat">
-                                <div class="stat-number" id="total-count">0</div>
-                                <div class="stat-label">Всего</div>
+                                <div class="stat-number" id="reviews-count">0</div>
+                                <div class="stat-label">Отзывы</div>
                             </div>
                         </div>
                     </div>
@@ -195,6 +195,22 @@
                     <h4>Мои объявления</h4>
                     <div id="my-products" class="products-list">
                         <!-- Товары пользователя -->
+                    </div>
+                </div>
+
+                <!-- Мои отзывы -->
+                <div class="profile-section">
+                    <h4>Мои отзывы</h4>
+                    <div id="my-reviews" class="reviews-list">
+                        <!-- Отзывы пользователя -->
+                    </div>
+                </div>
+
+                <!-- Полученные отзывы -->
+                <div class="profile-section">
+                    <h4>Полученные отзывы</h4>
+                    <div id="received-reviews" class="reviews-list">
+                        <!-- Отзывы от других пользователей -->
                     </div>
                 </div>
 
@@ -256,7 +272,6 @@
                     
                     <div class="product-share">
                         <button class="btn-share" onclick="App.shareProduct()">🔗 Поделиться ссылкой</button>
-                        <input type="text" id="product-link" readonly style="display: none;">
                     </div>
                     
                     <div class="product-seller">
@@ -265,19 +280,57 @@
                             <div class="seller-name" id="modal-seller-name"></div>
                             <div class="seller-city" id="modal-seller-city"></div>
                             <div class="seller-telegram" id="modal-seller-telegram"></div>
+                            <div class="seller-rating">
+                                Рейтинг: <span id="modal-seller-rating">0.0</span> ★
+                                (<span id="modal-seller-reviews-count">0</span> отзывов)
+                            </div>
                         </div>
                     </div>
                     
                     <div class="product-actions">
                         <button class="btn-contact" onclick="App.contactSeller()">📞 Связаться</button>
-                        <button class="btn-favorite" id="modal-favorite-btn" onclick="App.toggleFavorite()">❤️ В избранное</button>
+                        <button class="btn-favorite" id="modal-favorite-btn" onclick="App.toggleFavorite()">🤍 В избранное</button>
                         <div class="owner-actions" id="owner-actions" style="display: none;">
                             <button class="btn-edit" onclick="App.editProduct()">✏️ Редактировать</button>
                             <button class="btn-delete" onclick="App.deleteProduct()">🗑️ Удалить</button>
                         </div>
                     </div>
+                    
+                    <!-- Отзывы о продавце -->
+                    <div class="seller-reviews-section" id="seller-reviews-section" style="display: none;">
+                        <h4>Отзывы о продавце</h4>
+                        <div id="seller-reviews-list"></div>
+                        <button class="btn-add-review" id="btn-add-review" onclick="App.showReviewForm()">➕ Оставить отзыв</button>
+                    </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Попап отзыва -->
+    <div id="review-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Оставить отзыв</h3>
+                <span class="close-modal" onclick="App.closeReviewModal()">×</span>
+            </div>
+            <input type="hidden" id="review-seller-id">
+            <input type="hidden" id="review-seller-name">
+            
+            <div class="rating-selector">
+                <h4>Оценка:</h4>
+                <div class="stars" id="review-stars">
+                    <span class="star" data-rating="1">☆</span>
+                    <span class="star" data-rating="2">☆</span>
+                    <span class="star" data-rating="3">☆</span>
+                    <span class="star" data-rating="4">☆</span>
+                    <span class="star" data-rating="5">☆</span>
+                </div>
+                <div class="rating-text" id="rating-text">Выберите оценку</div>
+            </div>
+            
+            <textarea id="review-text" placeholder="Расскажите о вашем опыте покупки..." class="form-textarea"></textarea>
+            <button class="btn-primary" onclick="App.submitReview()">📝 Отправить отзыв</button>
         </div>
     </div>
 
