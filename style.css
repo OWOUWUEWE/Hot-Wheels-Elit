@@ -1247,5 +1247,96 @@ body {
     
     .photos-grid {
         grid-template-columns: repeat(2, 1fr);
-    }
+    }/* Добавить в начало стилей для авторизации */
+
+.auth-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 30px 0;
+}
+
+.auth-option-btn {
+    width: 100%;
+    padding: 18px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: left;
+}
+
+.auth-option-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    border-color: rgba(0, 212, 255, 0.3);
+}
+
+.auth-option-btn.telegram {
+    background: rgba(0, 136, 204, 0.1);
+    border-color: rgba(0, 136, 204, 0.3);
+}
+
+.auth-option-btn.telegram:hover {
+    background: rgba(0, 136, 204, 0.2);
+}
+
+.auth-option-icon {
+    font-size: 24px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 212, 255, 0.1);
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+
+.auth-option-btn.telegram .auth-option-icon {
+    background: rgba(0, 136, 204, 0.2);
+}
+
+.auth-option-text {
+    flex: 1;
+}
+
+.auth-option-title {
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+.auth-option-desc {
+    font-size: 13px;
+    color: #8b949e;
+}
+
+.auth-note {
+    margin-top: 25px;
+    padding: 20px;
+    background: rgba(0, 212, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(0, 212, 255, 0.1);
+}
+
+.auth-note p {
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #8b949e;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.auth-note p:before {
+    content: "✓";
+    color: #22c55e;
+    font-weight: bold;
+}
 }
