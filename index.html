@@ -28,7 +28,7 @@
                 </button>
                 
                 <div class="auth-hint">
-                    Бот для входа: <strong>@HotWheelsEliteBot</strong>
+                    <a href="#" onclick="showDemo()">Попробовать демо-версию</a>
                 </div>
             </div>
         </div>
@@ -50,14 +50,15 @@
             <!-- Главная -->
             <div id="home-content" class="content-page active">
                 <div class="category-tabs">
-                    <div class="tab active">Все</div>
-                    <div class="tab">Коллекционные</div>
-                    <div class="tab">Редкие</div>
-                    <div class="tab">Треки</div>
-                    <div class="tab">Распродажа</div>
+                    <div class="tab active" data-filter="all">Все</div>
+                    <div class="tab" data-filter="main">Мейнлайн</div>
+                    <div class="tab" data-filter="sth">STH</div>
+                    <div class="tab" data-filter="th">TH</div>
+                    <div class="tab" data-filter="set">Наборы</div>
+                    <div class="tab" data-filter="special">Спецки</div>
                 </div>
 
-                <div class="product-grid">
+                <div id="products-container" class="product-grid">
                     <!-- Товары загружаются через JS -->
                 </div>
             </div>
@@ -65,29 +66,106 @@
             <!-- Поиск -->
             <div id="search-content" class="content-page">
                 <div class="search-box">
-                    <input type="text" placeholder="Поиск моделей..." class="search-input">
-                    <div class="search-btn">🔍</div>
+                    <input type="text" placeholder="Поиск моделей..." class="search-input" id="search-input">
+                    <div class="search-btn" onclick="App.performSearch()">🔍</div>
                 </div>
-                <div class="search-results"></div>
+                <div id="search-results" class="search-results"></div>
             </div>
 
             <!-- Продать -->
             <div id="sell-content" class="content-page">
                 <div class="sell-container">
-                    <h3>Продать модель</h3>
-                    <input type="text" placeholder="Название модели" class="form-input">
-                    <input type="number" placeholder="Цена (₽)" class="form-input">
-                    <textarea placeholder="Описание" class="form-textarea"></textarea>
-                    <button class="btn-primary">Выложить на продажу</button>
+                    <h3>Выставить на продажу</h3>
+                    
+                    <!-- Фото -->
+                    <div class="photos-upload">
+                        <h4>Фотографии (до 3 шт.)</h4>
+                        <div class="photos-grid">
+                            <div class="photo-upload-box" onclick="document.getElementById('photo-input').click()">
+                                <div class="upload-icon">📷</div>
+                                <span>Добавить фото</span>
+                            </div>
+                            <div class="photo-preview"></div>
+                            <div class="photo-preview"></div>
+                        </div>
+                        <input type="file" id="photo-input" accept="image/*" multiple style="display: none;">
+                    </div>
+
+                    <!-- Основная информация -->
+                    <div class="form-group">
+                        <h4>Основная информация</h4>
+                        <input type="text" id="product-title" placeholder="Название модели" class="form-input" required>
+                        <textarea id="product-description" placeholder="Описание" class="form-textarea"></textarea>
+                        <input type="number" id="product-price" placeholder="Цена (₽)" class="form-input" required>
+                    </div>
+
+                    <!-- Категория -->
+                    <div class="form-group">
+                        <h4>Категория редкости</h4>
+                        <div class="rarity-grid">
+                            <div class="rarity-item active" data-rarity="main">
+                                <div class="rarity-icon">🚗</div>
+                                <span>Мейнлайн</span>
+                            </div>
+                            <div class="rarity-item" data-rarity="sth">
+                                <div class="rarity-icon">⭐</div>
+                                <span>STH</span>
+                            </div>
+                            <div class="rarity-item" data-rarity="th">
+                                <div class="rarity-icon">🔴</div>
+                                <span>TH</span>
+                            </div>
+                            <div class="rarity-item" data-rarity="set">
+                                <div class="rarity-icon">📦</div>
+                                <span>Набор</span>
+                            </div>
+                            <div class="rarity-item" data-rarity="special">
+                                <div class="rarity-icon">🎯</div>
+                                <span>Спецки</span>
+                            </div>
+                            <div class="rarity-item" data-rarity="limited">
+                                <div class="rarity-icon">👑</div>
+                                <span>Лимитки</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Состояние -->
+                    <div class="form-group">
+                        <h4>Состояние</h4>
+                        <div class="condition-buttons">
+                            <button class="condition-btn active" data-condition="new">Новый</button>
+                            <button class="condition-btn" data-condition="like_new">Как новый</button>
+                            <button class="condition-btn" data-condition="good">Хорошее</button>
+                            <button class="condition-btn" data-condition="used">Б/у</button>
+                        </div>
+                    </div>
+
+                    <!-- Контакты -->
+                    <div class="form-group">
+                        <h4>Контакты</h4>
+                        <input type="text" id="contact-city" placeholder="Город" class="form-input">
+                        <input type="tel" id="contact-phone" placeholder="Телефон (опционально)" class="form-input">
+                        <input type="text" id="contact-telegram" placeholder="@username в Telegram" class="form-input">
+                    </div>
+
+                    <!-- Кнопка публикации -->
+                    <button class="btn-primary" onclick="App.publishProduct()">Опубликовать</button>
+                    
+                    <div class="sell-note">
+                        После публикации объявление появится в общем каталоге. 
+                        Вы сможете редактировать его в своем профиле.
+                    </div>
                 </div>
             </div>
 
             <!-- Избранное -->
             <div id="favorites-content" class="content-page">
-                <div class="empty-state">
-                    <div class="empty-icon">❤️</div>
-                    <h4>Нет избранного</h4>
-                    <p>Добавляйте понравившиеся модели в избранное</p>
+                <div class="favorites-container">
+                    <h3>Избранное</h3>
+                    <div id="favorites-list" class="favorites-list">
+                        <!-- Избранные товары -->
+                    </div>
                 </div>
             </div>
 
@@ -99,39 +177,31 @@
                         <h3 id="profile-name">Пользователь</h3>
                         <div class="profile-stats">
                             <div class="stat">
-                                <div class="stat-number" id="reviews-count">0</div>
-                                <div class="stat-label">Отзывы</div>
+                                <div class="stat-number" id="active-count">0</div>
+                                <div class="stat-label">Активные</div>
                             </div>
                             <div class="stat">
-                                <div class="stat-number" id="products-count">0</div>
-                                <div class="stat-label">Товары</div>
+                                <div class="stat-number" id="sold-count">0</div>
+                                <div class="stat-label">Продано</div>
                             </div>
                             <div class="stat">
-                                <div class="stat-number" id="rating-value">0.0</div>
-                                <div class="stat-label">Рейтинг</div>
+                                <div class="stat-number" id="total-count">0</div>
+                                <div class="stat-label">Всего</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Мои товары -->
+                <!-- Мои объявления -->
                 <div class="profile-section">
-                    <h4>Мои товары</h4>
+                    <h4>Мои объявления</h4>
                     <div id="my-products" class="products-list">
                         <!-- Товары пользователя -->
                     </div>
                 </div>
 
-                <!-- Отзывы -->
-                <div class="profile-section">
-                    <h4>Отзывы <span class="reviews-count">(0)</span></h4>
-                    <div id="reviews-list" class="reviews-container">
-                        <!-- Отзывы -->
-                    </div>
-                </div>
-
                 <div class="profile-actions">
-                    <button class="btn-secondary" onclick="editProfile()">✏️ Редактировать</button>
+                    <button class="btn-secondary" onclick="editProfile()">✏️ Редактировать профиль</button>
                     <button class="btn-logout" onclick="logout()">🚪 Выйти</button>
                 </div>
             </div>
@@ -162,6 +232,43 @@
         </div>
     </div>
 
+    <!-- Попап товара -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content product-modal">
+            <div class="modal-header">
+                <h3 id="modal-product-title"></h3>
+                <span class="close-modal" onclick="App.closeProductModal()">×</span>
+            </div>
+            <div class="modal-body">
+                <div class="product-slider">
+                    <div class="slider-main">
+                        <img id="modal-main-image" src="" alt="">
+                    </div>
+                    <div class="slider-thumbs">
+                        <!-- Миниатюры -->
+                    </div>
+                </div>
+                <div class="product-details">
+                    <div class="product-price-large" id="modal-product-price"></div>
+                    <div class="product-rarity" id="modal-product-rarity"></div>
+                    <div class="product-condition" id="modal-product-condition"></div>
+                    <div class="product-description" id="modal-product-description"></div>
+                    <div class="product-seller">
+                        <div class="seller-avatar" id="modal-seller-avatar"></div>
+                        <div class="seller-info">
+                            <div class="seller-name" id="modal-seller-name"></div>
+                            <div class="seller-city" id="modal-seller-city"></div>
+                        </div>
+                    </div>
+                    <div class="product-actions">
+                        <button class="btn-contact" onclick="App.contactSeller()">📞 Связаться</button>
+                        <button class="btn-favorite" onclick="App.toggleFavorite()">❤️ В избранное</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Попап редактирования профиля -->
     <div id="edit-profile-modal" class="modal">
         <div class="modal-content">
@@ -171,6 +278,7 @@
             </div>
             <input type="text" id="edit-name" placeholder="Имя" class="form-input">
             <input type="text" id="edit-username" placeholder="Username" class="form-input">
+            <input type="text" id="edit-city" placeholder="Город" class="form-input">
             <button class="btn-primary" onclick="saveProfile()">Сохранить</button>
         </div>
     </div>

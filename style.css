@@ -97,6 +97,12 @@ body {
     font-size: 14px;
 }
 
+.auth-hint a {
+    color: #00d4ff;
+    text-decoration: none;
+    cursor: pointer;
+}
+
 /* Основное приложение */
 .header {
     padding: 15px 20px;
@@ -203,7 +209,7 @@ body {
     box-shadow: 0 8px 20px rgba(0, 212, 255, 0.1);
 }
 
-.product-img {
+.product-image {
     width: 100%;
     height: 150px;
     object-fit: cover;
@@ -240,44 +246,15 @@ body {
     color: #8b949e;
 }
 
-.rating {
-    color: #ffd700;
-}
-
-/* Поиск */
-.search-box {
-    padding: 20px;
-    display: flex;
-    gap: 10px;
-}
-
-.search-input {
-    flex: 1;
-    padding: 12px 16px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+.product-rarity-tag {
+    padding: 2px 8px;
     border-radius: 12px;
-    color: white;
-    font-size: 14px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
 }
 
-.search-input::placeholder {
-    color: #8b949e;
-}
-
-.search-btn {
-    width: 50px;
-    height: 50px;
-    background: #00d4ff;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 20px;
-}
-
-/* Продать */
+/* Страница продажи */
 .sell-container {
     padding: 20px;
 }
@@ -285,6 +262,85 @@ body {
 .sell-container h3 {
     margin-bottom: 20px;
     font-size: 22px;
+}
+
+.photos-upload {
+    margin-bottom: 25px;
+}
+
+.photos-upload h4 {
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.photos-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.photo-upload-box {
+    height: 100px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.photo-upload-box:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #00d4ff;
+}
+
+.upload-icon {
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.photo-preview {
+    height: 100px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+}
+
+.photo-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.photo-preview .remove-photo {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group h4 {
+    margin-bottom: 15px;
+    font-size: 16px;
 }
 
 .form-input, .form-textarea {
@@ -299,8 +355,73 @@ body {
 }
 
 .form-textarea {
-    height: 120px;
+    height: 100px;
     resize: vertical;
+    min-height: 100px;
+}
+
+/* Категории редкости */
+.rarity-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.rarity-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 15px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.rarity-item.active {
+    background: rgba(0, 212, 255, 0.1);
+    border-color: #00d4ff;
+    color: #00d4ff;
+}
+
+.rarity-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.rarity-icon {
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.rarity-item span {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Состояние */
+.condition-buttons {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+}
+
+.condition-btn {
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.3s;
+}
+
+.condition-btn.active {
+    background: rgba(0, 212, 255, 0.1);
+    border-color: #00d4ff;
+    color: #00d4ff;
 }
 
 .btn-primary {
@@ -314,6 +435,7 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s;
+    margin-top: 10px;
 }
 
 .btn-primary:hover {
@@ -321,23 +443,28 @@ body {
     transform: translateY(-2px);
 }
 
-/* Избранное */
-.empty-state {
-    text-align: center;
-    padding: 60px 20px;
+.sell-note {
+    margin-top: 15px;
     color: #8b949e;
+    font-size: 12px;
+    text-align: center;
+    line-height: 1.5;
 }
 
-.empty-icon {
-    font-size: 60px;
+/* Избранное */
+.favorites-container {
+    padding: 20px;
+}
+
+.favorites-container h3 {
     margin-bottom: 20px;
-    opacity: 0.5;
+    font-size: 22px;
 }
 
-.empty-state h4 {
-    font-size: 20px;
-    margin-bottom: 10px;
-    color: white;
+.favorites-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
 /* Профиль */
@@ -397,15 +524,6 @@ body {
 .profile-section h4 {
     font-size: 18px;
     margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.reviews-count {
-    color: #8b949e;
-    font-weight: normal;
-    font-size: 14px;
 }
 
 .products-list {
@@ -431,6 +549,10 @@ body {
 .product-name {
     font-weight: 600;
     font-size: 16px;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .product-status {
@@ -453,48 +575,6 @@ body {
 .product-price {
     color: #00d4ff;
     font-weight: bold;
-}
-
-.reviews-container {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.review-card {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    padding: 15px;
-}
-
-.review-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.reviewer {
-    font-weight: 600;
-    font-size: 14px;
-}
-
-.review-date {
-    color: #8b949e;
-    font-size: 12px;
-}
-
-.review-text {
-    font-size: 14px;
-    line-height: 1.5;
-    color: #ccc;
-}
-
-.review-rating {
-    color: #ffd700;
-    margin-top: 10px;
-    font-size: 14px;
 }
 
 .profile-actions {
@@ -542,6 +622,196 @@ body {
     background: rgba(255, 107, 107, 0.2);
 }
 
+/* Поиск */
+.search-box {
+    padding: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.search-input {
+    flex: 1;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: white;
+    font-size: 14px;
+}
+
+.search-input::placeholder {
+    color: #8b949e;
+}
+
+.search-btn {
+    width: 50px;
+    height: 50px;
+    background: #00d4ff;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.search-results {
+    padding: 0 20px 20px;
+}
+
+/* Модальное окно товара */
+.product-modal {
+    max-width: 400px;
+    padding: 0;
+    overflow: hidden;
+}
+
+.product-modal .modal-body {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.product-slider {
+    margin-bottom: 20px;
+}
+
+.slider-main {
+    width: 100%;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.slider-main img {
+    max-width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+}
+
+.slider-thumbs {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    overflow-x: auto;
+}
+
+.thumb-item {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.thumb-item.active {
+    border: 2px solid #00d4ff;
+}
+
+.product-details {
+    padding: 0 20px 20px;
+}
+
+.product-price-large {
+    font-size: 24px;
+    font-weight: bold;
+    color: #00d4ff;
+    margin-bottom: 10px;
+}
+
+.product-rarity, .product-condition {
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgba(0, 212, 255, 0.1);
+    color: #00d4ff;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.product-description {
+    margin: 15px 0;
+    line-height: 1.5;
+    color: #ccc;
+}
+
+.product-seller {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    margin: 20px 0;
+}
+
+.seller-avatar {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #00d4ff, #0099ff);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.seller-info {
+    flex: 1;
+}
+
+.seller-name {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.seller-city {
+    font-size: 14px;
+    color: #8b949e;
+}
+
+.product-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-contact {
+    flex: 1;
+    padding: 12px;
+    background: #00d4ff;
+    color: black;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-favorite {
+    flex: 1;
+    padding: 12px;
+    background: rgba(255, 107, 107, 0.1);
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    color: #ff6b6b;
+    border-radius: 12px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
 /* Модальное окно */
 .modal {
     display: none;
@@ -554,6 +824,7 @@ body {
     z-index: 1000;
     align-items: center;
     justify-content: center;
+    padding: 20px;
 }
 
 .modal.active {
@@ -564,9 +835,11 @@ body {
     background: #1a1a1a;
     border-radius: 20px;
     padding: 25px;
-    width: 90%;
+    width: 100%;
     max-width: 400px;
     border: 1px solid rgba(255, 255, 255, 0.1);
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .modal-header {
@@ -635,5 +908,9 @@ body {
     
     .profile-stats {
         gap: 15px;
+    }
+    
+    .rarity-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
