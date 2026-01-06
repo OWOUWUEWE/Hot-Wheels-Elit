@@ -3,70 +3,31 @@ const App = {
     user: null,
     currentPage: 'home',
     products: [],
-    reviews: [],
     favorites: new Set(),
     selectedRarity: 'main',
     selectedCondition: 'new',
     uploadedPhotos: [],
     editingProductId: null,
     currentProductId: null,
-    selectedRating: 0,
     
     init() {
         this.loadUser();
         this.loadProducts();
-        this.loadReviews();
         this.loadFavorites();
         this.initTelegram();
         this.bindEvents();
         this.setupPhotoUpload();
         this.setupRaritySelection();
         this.setupConditionSelection();
-        this.handleUrlParams();
     },
     
-    // Загрузка пользователя - ФИКС БАГА
+    // Загрузка пользователя
     loadUser() {
-        // Проверяем, есть ли зашифрованный пользователь в localStorage
-        const encryptedUser = localStorage.getItem('hotwheels_user_encrypted');
-        if (encryptedUser) {
-            try {
-                // Простая дешифровка (в продакшене нужно использовать crypto API)
-                const decoded = atob(encryptedUser);
-                this.user = JSON.parse(decoded);
-                this.showApp();
-            } catch (e) {
-                console.log('Ошибка загрузки пользователя, создаем нового');
-                this.createNewUser();
-            }
-        } else {
-            this.createNewUser();
+        const savedUser = localStorage.getItem('hotwheels_user');
+        if (savedUser) {
+            this.user = JSON.parse(savedUser);
+            this.showApp();
         }
-    },
-    
-    // Создание нового пользователя
-    createNewUser() {
-        const userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        this.user = {
-            id: userId,
-            username: 'user_' + userId.substr(0, 8),
-            first_name: 'Пользователь',
-            last_name: '',
-            avatar: 'П',
-            city: '',
-            registration_date: new Date().toISOString(),
-            rating: 5.0,
-            reviews_count: 0
-        };
-        this.saveUser();
-    },
-    
-    // Сохранение пользователя с шифрованием
-    saveUser() {
-        if (!this.user) return;
-        // Простое шифрование (в продакшене использовать Web Crypto API)
-        const encrypted = btoa(JSON.stringify(this.user));
-        localStorage.setItem('hotwheels_user_encrypted', encrypted);
     },
     
     // Инициализация Telegram Web App
@@ -79,60 +40,38 @@ const App = {
             if (tg.initDataUnsafe?.user) {
                 const tgUser = tg.initDataUnsafe.user;
                 this.user = {
-                    id: 'tg_' + tgUser.id,
-                    username: tgUser.username || `tg_user_${tgUser.id}`,
-                    first_name: tgUser.first_name || 'Telegram',
+                    id: tgUser.id,
+                    username: tgUser.username || `user_${tgUser.id}`,
+                    first_name: tgUser.first_name || 'Пользователь',
                     last_name: tgUser.last_name || '',
                     avatar: tgUser.first_name?.[0] || 'TG',
                     city: '',
-                    registration_date: new Date().toISOString(),
-                    rating: 5.0,
-                    reviews_count: 0,
-                    telegram_id: tgUser.id,
-                    telegram_username: tgUser.username
+                    registration_date: new Date().toISOString()
                 };
                 
-                this.saveUser();
+                localStorage.setItem('hotwheels_user', JSON.stringify(this.user));
                 this.showApp();
+                this.saveToServer();
             }
-        }
-    },
-    
-    // Обработка параметров URL - ФИКС БАГА С ССЫЛКАМИ
-    handleUrlParams() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const productId = urlParams.get('product');
-        
-        if (productId) {
-            // Сохраняем ID товара для показа после загрузки
-            this.pendingProductId = parseInt(productId);
-        }
-        
-        // Убираем параметры из URL чтобы предотвратить доступ к чужим аккаунтам
-        if (window.location.search) {
-            window.history.replaceState({}, document.title, window.location.pathname);
         }
     },
     
     // Показать демо-версию
     showDemo() {
         this.user = {
-            id: 'demo_user_' + Date.now(),
+            id: 'demo_user_123',
             username: 'demo_user',
             first_name: 'Демо',
             last_name: 'Пользователь',
-            avatar: 'Д',
+            avatar: 'D',
             city: 'Москва',
             telegram: '@demo_user',
-            registration_date: new Date().toISOString(),
-            rating: 4.8,
-            reviews_count: 3
+            registration_date: new Date().toISOString()
         };
         
-        this.saveUser();
+        localStorage.setItem('hotwheels_user', JSON.stringify(this.user));
         this.showApp();
         this.loadDemoProducts();
-        this.loadDemoReviews();
     },
     
     // Привязка событий
@@ -156,8 +95,7 @@ const App = {
         
         // Вкладки категорий
         document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', (e) => {
-                e.stopPropagation();
+            tab.addEventListener('click', () => {
                 document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
                 const filter = tab.dataset.filter;
@@ -178,7 +116,7 @@ const App = {
         });
     },
     
-    // Настройка загрузки фото - ФИКС РАСТЯГИВАНИЯ
+    // Настройка загрузки фото
     setupPhotoUpload() {
         const photoInput = document.getElementById('photo-input');
         if (!photoInput) return;
@@ -217,13 +155,13 @@ const App = {
         this.updatePhotoPreviews();
     },
     
-    // Обновление превью фото - ФИКС РАСТЯГИВАНИЯ
+    // Обновление превью фото
     updatePhotoPreviews() {
         const grid = document.getElementById('photos-grid');
         if (!grid) return;
         
-        // Очищаем контейнер
-        grid.innerHTML = '';
+        // Очищаем и добавляем кнопку загрузки
+        grid.innerHTML = '<div class="photo-upload-box" onclick="document.getElementById(\'photo-input\').click()"><div class="upload-icon">📷</div><span>Добавить фото</span></div>';
         
         // Добавляем превью загруженных фото
         this.uploadedPhotos.forEach((file, index) => {
@@ -235,22 +173,10 @@ const App = {
                     <img src="${e.target.result}" alt="Фото ${index + 1}">
                     <button class="remove-photo-btn" onclick="App.removePhoto(${index})">×</button>
                 `;
-                grid.appendChild(preview);
+                grid.insertBefore(preview, grid.firstChild);
             };
             reader.readAsDataURL(file);
         });
-        
-        // Добавляем кнопку загрузки, если меньше 3 фото
-        if (this.uploadedPhotos.length < 3) {
-            const uploadBox = document.createElement('div');
-            uploadBox.className = 'photo-upload-box';
-            uploadBox.onclick = () => document.getElementById('photo-input').click();
-            uploadBox.innerHTML = `
-                <div class="upload-icon">📷</div>
-                <span>Добавить фото</span>
-            `;
-            grid.appendChild(uploadBox);
-        }
     },
     
     // Удаление фото
@@ -261,8 +187,7 @@ const App = {
     
     // Сохранение фото в localStorage
     savePhotosToStorage(productId, photos) {
-        const photoData = JSON.parse(localStorage.getItem('product_photos') || '{}');
-        
+        const photoData = {};
         photos.forEach((file, index) => {
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -291,8 +216,7 @@ const App = {
     // Настройка выбора редкости
     setupRaritySelection() {
         document.querySelectorAll('.rarity-item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.stopPropagation();
+            item.addEventListener('click', () => {
                 document.querySelectorAll('.rarity-item').forEach(i => i.classList.remove('active'));
                 item.classList.add('active');
                 this.selectedRarity = item.dataset.rarity;
@@ -303,8 +227,7 @@ const App = {
     // Настройка выбора состояния
     setupConditionSelection() {
         document.querySelectorAll('.condition-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
+            btn.addEventListener('click', () => {
                 document.querySelectorAll('.condition-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 this.selectedCondition = btn.dataset.condition;
@@ -378,23 +301,12 @@ const App = {
         document.getElementById('app-screen').classList.add('active');
         
         if (this.user) {
-            const avatar = this.user.first_name?.[0] || this.user.username?.[0] || 'П';
+            const avatar = this.user.first_name?.[0] || this.user.username?.[0] || 'TG';
             document.getElementById('user-avatar').textContent = avatar;
             document.getElementById('profile-avatar').textContent = avatar;
         }
         
         this.switchPage('home');
-        
-        // Показываем отложенный товар
-        if (this.pendingProductId) {
-            setTimeout(() => {
-                const product = this.products.find(p => p.id === this.pendingProductId);
-                if (product) {
-                    this.showProduct(this.pendingProductId);
-                }
-                this.pendingProductId = null;
-            }, 500);
-        }
     },
     
     // Загрузка продуктов
@@ -405,8 +317,8 @@ const App = {
             
             // Загружаем фото из localStorage для каждого продукта
             this.products.forEach(product => {
-                if (product.hasPhotos && product.photoCount) {
-                    product.images = this.getPhotosFromStorage(product.id, product.photoCount);
+                if (product.hasPhotos) {
+                    product.images = this.getPhotosFromStorage(product.id, product.photoCount || 1);
                 }
             });
         } else {
@@ -457,48 +369,29 @@ const App = {
                 status: 'active',
                 hasPhotos: false,
                 photoCount: 1
+            },
+            {
+                id: 3,
+                title: 'Porsche 911 Turbo Treasure Hunt',
+                price: 4200,
+                description: 'TH модель 2022 года. В отличном состоянии, колеса не потерты.',
+                rarity: 'th',
+                condition: 'good',
+                city: 'Казань',
+                seller: {
+                    id: 'seller3',
+                    name: 'Мария С.',
+                    avatar: 'М',
+                    telegram: '@maria_cars'
+                },
+                images: ['https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop'],
+                date: '2024-01-13',
+                status: 'active',
+                hasPhotos: false,
+                photoCount: 1
             }
         ];
         localStorage.setItem('hotwheels_products', JSON.stringify(this.products));
-    },
-    
-    // Загрузка отзывов
-    loadReviews() {
-        const savedReviews = localStorage.getItem('hotwheels_reviews');
-        if (savedReviews) {
-            this.reviews = JSON.parse(savedReviews);
-        } else {
-            this.loadDemoReviews();
-        }
-    },
-    
-    // Демо-отзывы
-    loadDemoReviews() {
-        this.reviews = [
-            {
-                id: 1,
-                sellerId: 'seller1',
-                sellerName: 'Иван П.',
-                buyerId: 'buyer1',
-                buyerName: 'Анна С.',
-                rating: 5,
-                text: 'Отличный продавец! Модель пришла быстро, упаковка идеальная. Рекомендую!',
-                date: '2024-01-10',
-                productId: 1
-            },
-            {
-                id: 2,
-                sellerId: 'seller2',
-                sellerName: 'Алексей К.',
-                buyerId: 'buyer2',
-                buyerName: 'Дмитрий В.',
-                rating: 4,
-                text: 'Всё хорошо, но доставка заняла чуть дольше чем обещали. Модель качественная.',
-                date: '2024-01-12',
-                productId: 2
-            }
-        ];
-        localStorage.setItem('hotwheels_reviews', JSON.stringify(this.reviews));
     },
     
     // Рендер продуктов
@@ -525,7 +418,7 @@ const App = {
         
         container.innerHTML = filtered.map(product => `
             <div class="product-card" onclick="App.showProduct(${product.id})">
-                <img src="${product.images && product.images[0] ? product.images[0] : 'https://images.unsplash.com/photo-1566474595102-2f7606e8b533?w=400&h=300&fit=crop'}" 
+                <img src="${product.images[0] || 'https://images.unsplash.com/photo-1566474595102-2f7606e8b533?w=400&h=300&fit=crop'}" 
                      class="product-image" 
                      alt="${product.title}"
                      onerror="this.src='https://images.unsplash.com/photo-1566474595102-2f7606e8b533?w=400&h=300&fit=crop'">
@@ -597,10 +490,7 @@ const App = {
     // Показать товар
     showProduct(id) {
         const product = this.products.find(p => p.id === id);
-        if (!product) {
-            this.showNotification('Товар не найден', 'error');
-            return;
-        }
+        if (!product) return;
         
         this.currentProductId = id;
         const modal = document.getElementById('product-modal');
@@ -616,19 +506,11 @@ const App = {
         document.getElementById('modal-seller-city').textContent = product.city;
         document.getElementById('modal-seller-telegram').textContent = product.seller.telegram || 'Не указан';
         
-        // Загружаем рейтинг продавца
-        const sellerReviews = this.reviews.filter(r => r.sellerId === product.seller.id);
-        const sellerRating = this.calculateSellerRating(product.seller.id);
-        document.getElementById('modal-seller-rating').textContent = sellerRating.toFixed(1);
-        document.getElementById('modal-seller-reviews-count').textContent = sellerReviews.length;
-        
         // Загружаем фото
         const mainImage = document.getElementById('modal-main-image');
         if (product.images && product.images.length > 0) {
             mainImage.src = product.images[0];
             mainImage.alt = product.title;
-        } else {
-            mainImage.src = 'https://images.unsplash.com/photo-1566474595102-2f7606e8b533?w=400&h=300&fit=crop';
         }
         
         // Создаем миниатюры
@@ -636,7 +518,7 @@ const App = {
         if (product.images && product.images.length > 1) {
             thumbsContainer.innerHTML = product.images.map((img, index) => `
                 <div class="thumb-item ${index === 0 ? 'active' : ''}" onclick="App.changeMainImage('${img}')">
-                    <img src="${img}" alt="Фото ${index + 1}">
+                    <img src="${img}" alt="Фото ${index + 1}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;">
                 </div>
             `).join('');
             thumbsContainer.style.display = 'flex';
@@ -649,10 +531,10 @@ const App = {
         const favoriteBtn = document.getElementById('modal-favorite-btn');
         if (this.favorites.has(id)) {
             favoriteBtn.innerHTML = '❤️ Удалить из избранного';
-            favoriteBtn.className = 'btn-favorite favorited';
+            favoriteBtn.style.background = 'rgba(255, 107, 107, 0.3)';
         } else {
             favoriteBtn.innerHTML = '🤍 В избранное';
-            favoriteBtn.className = 'btn-favorite';
+            favoriteBtn.style.background = 'rgba(255, 107, 107, 0.1)';
         }
         
         // Показываем/скрываем кнопки владельца
@@ -663,227 +545,7 @@ const App = {
             ownerActions.style.display = 'none';
         }
         
-        // Отображаем отзывы о продавце
-        this.showSellerReviews(product.seller.id);
-        
-        // Показываем/скрываем кнопку "Оставить отзыв"
-        const addReviewBtn = document.getElementById('btn-add-review');
-        const sellerReviewsSection = document.getElementById('seller-reviews-section');
-        
-        if (this.user && product.seller.id !== this.user.id) {
-            // Проверяем, оставлял ли уже пользователь отзыв этому продавцу
-            const userReview = this.reviews.find(r => 
-                r.sellerId === product.seller.id && r.buyerId === this.user.id
-            );
-            
-            if (userReview) {
-                addReviewBtn.style.display = 'none';
-                addReviewBtn.innerHTML = '✏️ Редактировать отзыв';
-                addReviewBtn.onclick = () => this.editReview(userReview.id);
-            } else {
-                addReviewBtn.style.display = 'block';
-                addReviewBtn.innerHTML = '➕ Оставить отзыв';
-                addReviewBtn.onclick = () => this.showReviewForm(product.seller.id, product.seller.name);
-            }
-            sellerReviewsSection.style.display = 'block';
-        } else {
-            sellerReviewsSection.style.display = 'none';
-        }
-        
         modal.classList.add('active');
-    },
-    
-    // Отобразить отзывы о продавце
-    showSellerReviews(sellerId) {
-        const sellerReviews = this.reviews.filter(r => r.sellerId === sellerId);
-        const reviewsList = document.getElementById('seller-reviews-list');
-        
-        if (sellerReviews.length === 0) {
-            reviewsList.innerHTML = '<p style="color: #8b949e; text-align: center;">У продавца пока нет отзывов</p>';
-            return;
-        }
-        
-        reviewsList.innerHTML = sellerReviews.map(review => `
-            <div class="seller-review-item">
-                <div class="seller-review-header">
-                    <div class="seller-review-rating">${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</div>
-                    <div class="seller-review-date">${new Date(review.date).toLocaleDateString('ru-RU')}</div>
-                </div>
-                <div class="seller-review-text">${review.text}</div>
-                <div style="font-size: 12px; color: #8b949e; margin-top: 8px;">От: ${review.buyerName}</div>
-            </div>
-        `).join('');
-    },
-    
-    // Показать форму отзыва
-    showReviewForm(sellerId, sellerName) {
-        if (!this.user) {
-            this.showNotification('Войдите в аккаунт чтобы оставить отзыв', 'error');
-            return;
-        }
-        
-        // Проверяем, не оставлял ли уже пользователь отзыв этому продавцу
-        const existingReview = this.reviews.find(r => 
-            r.sellerId === sellerId && r.buyerId === this.user.id
-        );
-        
-        if (existingReview) {
-            this.showNotification('Вы уже оставляли отзыв этому продавцу', 'error');
-            return;
-        }
-        
-        document.getElementById('review-seller-id').value = sellerId;
-        document.getElementById('review-seller-name').value = sellerName;
-        
-        // Сбрасываем рейтинг
-        this.selectedRating = 0;
-        document.querySelectorAll('.star').forEach(star => {
-            star.classList.remove('active');
-            star.textContent = '☆';
-        });
-        document.getElementById('rating-text').textContent = 'Выберите оценку';
-        
-        // Настраиваем звезды
-        document.querySelectorAll('.star').forEach(star => {
-            star.onclick = () => {
-                const rating = parseInt(star.dataset.rating);
-                this.selectedRating = rating;
-                
-                document.querySelectorAll('.star').forEach(s => {
-                    const sRating = parseInt(s.dataset.rating);
-                    s.classList.toggle('active', sRating <= rating);
-                    s.textContent = sRating <= rating ? '★' : '☆';
-                });
-                
-                const texts = ['Ужасно', 'Плохо', 'Нормально', 'Хорошо', 'Отлично'];
-                document.getElementById('rating-text').textContent = texts[rating - 1] || 'Выберите оценку';
-            };
-        });
-        
-        document.getElementById('review-text').value = '';
-        document.getElementById('review-modal').classList.add('active');
-    },
-    
-    // Закрыть форму отзыва
-    closeReviewModal() {
-        document.getElementById('review-modal').classList.remove('active');
-    },
-    
-    // Отправить отзыв
-    submitReview() {
-        const sellerId = document.getElementById('review-seller-id').value;
-        const sellerName = document.getElementById('review-seller-name').value;
-        const text = document.getElementById('review-text').value.trim();
-        
-        if (this.selectedRating === 0) {
-            this.showNotification('Выберите оценку', 'error');
-            return;
-        }
-        
-        if (!text) {
-            this.showNotification('Напишите текст отзыва', 'error');
-            return;
-        }
-        
-        // Проверяем, не оставлял ли уже пользователь отзыв
-        const existingReviewIndex = this.reviews.findIndex(r => 
-            r.sellerId === sellerId && r.buyerId === this.user.id
-        );
-        
-        if (existingReviewIndex !== -1) {
-            // Обновляем существующий отзыв
-            this.reviews[existingReviewIndex] = {
-                ...this.reviews[existingReviewIndex],
-                rating: this.selectedRating,
-                text: text,
-                date: new Date().toISOString()
-            };
-        } else {
-            // Создаем новый отзыв
-            const newReview = {
-                id: Date.now(),
-                sellerId: sellerId,
-                sellerName: sellerName,
-                buyerId: this.user.id,
-                buyerName: this.user.first_name + ' ' + (this.user.last_name || ''),
-                rating: this.selectedRating,
-                text: text,
-                date: new Date().toISOString(),
-                productId: this.currentProductId
-            };
-            
-            this.reviews.push(newReview);
-        }
-        
-        // Сохраняем отзывы
-        localStorage.setItem('hotwheels_reviews', JSON.stringify(this.reviews));
-        
-        // Обновляем рейтинг продавца
-        this.updateSellerRating(sellerId);
-        
-        this.showNotification('Отзыв сохранен!');
-        this.closeReviewModal();
-        
-        // Обновляем отзывы в модалке товара
-        if (this.currentProductId) {
-            const product = this.products.find(p => p.id === this.currentProductId);
-            if (product) {
-                this.showSellerReviews(product.seller.id);
-                
-                // Обновляем кнопку
-                const addReviewBtn = document.getElementById('btn-add-review');
-                addReviewBtn.style.display = 'none';
-                addReviewBtn.innerHTML = '✏️ Редактировать отзыв';
-                addReviewBtn.onclick = () => {
-                    const userReview = this.reviews.find(r => 
-                        r.sellerId === product.seller.id && r.buyerId === this.user.id
-                    );
-                    if (userReview) {
-                        this.editReview(userReview.id);
-                    }
-                };
-            }
-        }
-        
-        // Обновляем профиль
-        if (this.currentPage === 'profile') {
-            this.updateProfile();
-        }
-    },
-    
-    // Редактировать отзыв
-    editReview(reviewId) {
-        const review = this.reviews.find(r => r.id === reviewId);
-        if (!review) return;
-        
-        this.showReviewForm(review.sellerId, review.sellerName);
-        
-        // Заполняем существующими данными
-        this.selectedRating = review.rating;
-        document.querySelectorAll('.star').forEach(star => {
-            const rating = parseInt(star.dataset.rating);
-            star.classList.toggle('active', rating <= review.rating);
-            star.textContent = rating <= review.rating ? '★' : '☆';
-        });
-        
-        const texts = ['Ужасно', 'Плохо', 'Нормально', 'Хорошо', 'Отлично'];
-        document.getElementById('rating-text').textContent = texts[review.rating - 1] || 'Выберите оценку';
-        document.getElementById('review-text').value = review.text;
-    },
-    
-    // Вычислить рейтинг продавца
-    calculateSellerRating(sellerId) {
-        const sellerReviews = this.reviews.filter(r => r.sellerId === sellerId);
-        if (sellerReviews.length === 0) return 5.0;
-        
-        const totalRating = sellerReviews.reduce((sum, review) => sum + review.rating, 0);
-        return totalRating / sellerReviews.length;
-    },
-    
-    // Обновить рейтинг продавца
-    updateSellerRating(sellerId) {
-        // В реальном приложении здесь можно обновить данные продавца
-        console.log(`Рейтинг продавца ${sellerId} обновлен`);
     },
     
     // Смена главного изображения
@@ -891,7 +553,7 @@ const App = {
         document.getElementById('modal-main-image').src = src;
         document.querySelectorAll('.thumb-item').forEach(thumb => {
             const img = thumb.querySelector('img');
-            thumb.classList.toggle('active', img && img.src === src);
+            thumb.classList.toggle('active', img && img.src.includes(src));
         });
     },
     
@@ -931,47 +593,28 @@ const App = {
         this.showNotification(`Открывается чат с ${product.seller.name}`);
     },
     
-    // Поделиться ссылкой - ФИКС БЕЗОПАСНОСТИ
+    // Поделиться ссылкой
     shareProduct() {
         const product = this.products.find(p => p.id === this.currentProductId);
         if (!product) return;
         
-        // Создаем безопасную ссылку без доступа к аккаунту
-        const baseUrl = window.location.origin + window.location.pathname;
-        const link = `${baseUrl}?product=${product.id}`;
+        const link = `${window.location.origin}${window.location.pathname}#product=${product.id}`;
+        
+        // Показываем поле для копирования
+        const linkInput = document.getElementById('product-link');
+        linkInput.value = link;
+        linkInput.style.display = 'block';
         
         // Копируем в буфер обмена
-        if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(link).then(() => {
-                this.showNotification('Ссылка скопирована в буфер обмена!');
-            }).catch(() => {
-                this.fallbackCopy(link);
-            });
-        } else {
-            this.fallbackCopy(link);
-        }
-    },
-    
-    // Резервное копирование для старых браузеров
-    fallbackCopy(text) {
-        const textArea = document.createElement('textarea');
-        textArea.value = text;
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-999999px';
-        textArea.style.top = '-999999px';
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
+        linkInput.select();
+        document.execCommand('copy');
         
-        try {
-            document.execCommand('copy');
-            this.showNotification('Ссылка скопирована в буфер обмена!');
-        } catch (err) {
-            console.error('Не удалось скопировать текст: ', err);
-            this.showNotification('Не удалось скопировать ссылку', 'error');
-        }
+        this.showNotification('Ссылка скопирована в буфер обмена!');
         
-        document.body.removeChild(textArea);
+        // Скрываем поле через 3 секунды
+        setTimeout(() => {
+            linkInput.style.display = 'none';
+        }, 3000);
     },
     
     // Добавить/удалить из избранного
@@ -1002,10 +645,10 @@ const App = {
             const favoriteBtn = document.getElementById('modal-favorite-btn');
             if (this.favorites.has(id)) {
                 favoriteBtn.innerHTML = '❤️ Удалить из избранного';
-                favoriteBtn.className = 'btn-favorite favorited';
+                favoriteBtn.style.background = 'rgba(255, 107, 107, 0.3)';
             } else {
                 favoriteBtn.innerHTML = '🤍 В избранное';
-                favoriteBtn.className = 'btn-favorite';
+                favoriteBtn.style.background = 'rgba(255, 107, 107, 0.1)';
             }
         }
     },
@@ -1024,8 +667,8 @@ const App = {
             return;
         }
         
-        if (!price || price <= 0 || price > 10000000) {
-            this.showNotification('Введите корректную цену (1-10,000,000 ₽)', 'error');
+        if (!price || price <= 0) {
+            this.showNotification('Введите корректную цену', 'error');
             return;
         }
         
@@ -1053,12 +696,14 @@ const App = {
             condition: this.selectedCondition,
             city,
             seller: {
-                id: this.user.id,
-                name: this.user.first_name + ' ' + (this.user.last_name || ''),
-                avatar: this.user.avatar || '?',
-                telegram: telegram || this.user.telegram || ''
+                id: this.user?.id || 'anonymous',
+                name: this.user?.first_name || 'Аноним',
+                avatar: this.user?.avatar || '?',
+                telegram: telegram || this.user?.telegram || ''
             },
-            images: [], // Будет загружено из localStorage
+            images: this.uploadedPhotos.map((file, index) => 
+                `data:${file.type};base64,${btoa(String.fromCharCode(...new Uint8Array(file.arrayBuffer)))}`
+            ),
             date: new Date().toISOString(),
             status: 'active',
             hasPhotos: true,
@@ -1087,7 +732,7 @@ const App = {
         const results = this.products.filter(p => 
             p.status === 'active' && (
                 p.title.toLowerCase().includes(query) || 
-                (p.description && p.description.toLowerCase().includes(query)) ||
+                p.description.toLowerCase().includes(query) ||
                 p.city.toLowerCase().includes(query) ||
                 this.getRarityName(p.rarity).toLowerCase().includes(query)
             )
@@ -1106,7 +751,7 @@ const App = {
         
         resultsContainer.innerHTML = results.map(product => `
             <div class="product-card" onclick="App.showProduct(${product.id})" style="margin-bottom: 15px;">
-                <img src="${product.images && product.images[0] ? product.images[0] : 'https://images.unsplash.com/photo-1566474595102-2f7606e8b533?w=400&h=300&fit=crop'}" 
+                <img src="${product.images[0] || 'https://images.unsplash.com/photo-1566474595102-2f7606e8b533?w=400&h=300&fit=crop'}" 
                      class="product-image" 
                      alt="${product.title}">
                 <div class="product-info">
@@ -1156,7 +801,7 @@ const App = {
         
         container.innerHTML = favoriteProducts.map(product => `
             <div class="product-card" onclick="App.showProduct(${product.id})" style="margin-bottom: 15px;">
-                <img src="${product.images && product.images[0] ? product.images[0] : 'https://images.unsplash.com/photo-1566474595102-2f7606e8b533?w=400&h=300&fit=crop'}" 
+                <img src="${product.images[0] || 'https://images.unsplash.com/photo-1566474595102-2f7606e8b533?w=400&h=300&fit=crop'}" 
                      class="product-image" 
                      alt="${product.title}">
                 <div class="product-info">
@@ -1196,11 +841,6 @@ const App = {
         // Устанавливаем статус
         document.querySelectorAll('.status-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.status === product.status);
-            btn.onclick = (e) => {
-                e.stopPropagation();
-                document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-            };
         });
         
         // Показываем модалку
@@ -1223,20 +863,10 @@ const App = {
         const product = this.products[productIndex];
         
         // Обновляем данные
-        const newTitle = document.getElementById('edit-title').value.trim();
-        const newDescription = document.getElementById('edit-description').value.trim();
-        const newPrice = parseInt(document.getElementById('edit-price').value);
-        const newCity = document.getElementById('edit-city').value.trim();
-        
-        if (!newTitle || newPrice <= 0) {
-            this.showNotification('Заполните все поля корректно', 'error');
-            return;
-        }
-        
-        product.title = newTitle;
-        product.description = newDescription;
-        product.price = newPrice;
-        product.city = newCity;
+        product.title = document.getElementById('edit-title').value.trim();
+        product.description = document.getElementById('edit-description').value.trim();
+        product.price = parseInt(document.getElementById('edit-price').value);
+        product.city = document.getElementById('edit-city').value.trim();
         
         // Обновляем статус
         const activeStatusBtn = document.querySelector('.status-btn.active');
@@ -1257,8 +887,6 @@ const App = {
             this.updateProfile();
         } else if (this.currentPage === 'home') {
             this.renderProducts();
-        } else if (this.currentPage === 'favorites') {
-            this.renderFavorites();
         }
     },
     
@@ -1305,7 +933,7 @@ const App = {
         if (!this.user) return;
         
         // Обновляем аватар
-        const avatar = this.user.first_name?.[0] || this.user.username?.[0] || 'П';
+        const avatar = this.user.first_name?.[0] || this.user.username?.[0] || 'TG';
         document.getElementById('profile-avatar').textContent = avatar;
         document.getElementById('user-avatar').textContent = avatar;
         
@@ -1315,28 +943,15 @@ const App = {
         
         // Загружаем мои объявления
         this.loadMyProducts();
-        
-        // Загружаем мои отзывы
-        this.loadMyReviews();
-        
-        // Загружаем полученные отзывы
-        this.loadReceivedReviews();
-        
-        // Обновляем статистику
-        const myProducts = this.products.filter(p => p.seller.id === this.user.id);
-        const active = myProducts.filter(p => p.status === 'active').length;
-        const sold = myProducts.filter(p => p.status === 'sold').length;
-        
-        document.getElementById('active-count').textContent = active;
-        document.getElementById('sold-count').textContent = sold;
-        document.getElementById('reviews-count').textContent = this.reviews.filter(r => r.sellerId === this.user.id).length;
     },
     
     // Загрузка моих объявлений
     loadMyProducts() {
         if (!this.user) return;
         
-        const myProducts = this.products.filter(p => p.seller.id === this.user.id);
+        const myProducts = this.products.filter(p => 
+            p.seller.id === this.user.id
+        );
         
         const container = document.getElementById('my-products');
         if (myProducts.length === 0) {
@@ -1370,65 +985,14 @@ const App = {
                 </div>
             `).join('');
         }
-    },
-    
-    // Загрузка моих отзывов (которые я оставил)
-    loadMyReviews() {
-        if (!this.user) return;
         
-        const myReviews = this.reviews.filter(r => r.buyerId === this.user.id);
+        // Обновляем статистику
+        const active = myProducts.filter(p => p.status === 'active').length;
+        const sold = myProducts.filter(p => p.status === 'sold').length;
         
-        const container = document.getElementById('my-reviews');
-        if (myReviews.length === 0) {
-            container.innerHTML = `
-                <div class="empty-state" style="text-align: center; padding: 20px 0;">
-                    <p style="color: #8b949e;">Вы еще не оставляли отзывы</p>
-                </div>
-            `;
-        } else {
-            container.innerHTML = myReviews.map(review => `
-                <div class="review-item">
-                    <div class="review-header">
-                        <div class="reviewer-name">${review.sellerName}</div>
-                        <div class="review-date">${new Date(review.date).toLocaleDateString('ru-RU')}</div>
-                    </div>
-                    <div class="review-rating">${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</div>
-                    <div class="review-text">${review.text}</div>
-                    <div style="margin-top: 10px;">
-                        <button class="btn-edit" style="padding: 4px 8px; font-size: 12px;" onclick="App.editReview(${review.id})">
-                            ✏️ Редактировать
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-    },
-    
-    // Загрузка полученных отзывов (от других пользователей)
-    loadReceivedReviews() {
-        if (!this.user) return;
-        
-        const receivedReviews = this.reviews.filter(r => r.sellerId === this.user.id);
-        
-        const container = document.getElementById('received-reviews');
-        if (receivedReviews.length === 0) {
-            container.innerHTML = `
-                <div class="empty-state" style="text-align: center; padding: 20px 0;">
-                    <p style="color: #8b949e;">У вас еще нет отзывов</p>
-                </div>
-            `;
-        } else {
-            container.innerHTML = receivedReviews.map(review => `
-                <div class="review-item">
-                    <div class="review-header">
-                        <div class="reviewer-name">${review.buyerName}</div>
-                        <div class="review-date">${new Date(review.date).toLocaleDateString('ru-RU')}</div>
-                    </div>
-                    <div class="review-rating">${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</div>
-                    <div class="review-text">${review.text}</div>
-                </div>
-            `).join('');
-        }
+        document.getElementById('active-count').textContent = active;
+        document.getElementById('sold-count').textContent = sold;
+        document.getElementById('total-count').textContent = myProducts.length;
     },
     
     // Редактировать товар прямо из профиля
@@ -1487,9 +1051,7 @@ const App = {
         
         // Удаляем через 3 секунды
         setTimeout(() => {
-            if (notification.parentNode) {
-                notification.parentNode.removeChild(notification);
-            }
+            notification.remove();
         }, 3000);
     },
     
@@ -1497,19 +1059,20 @@ const App = {
     loadFavorites() {
         const saved = localStorage.getItem('hotwheels_favorites');
         if (saved) {
-            try {
-                this.favorites = new Set(JSON.parse(saved));
-            } catch (e) {
-                this.favorites = new Set();
-            }
+            this.favorites = new Set(JSON.parse(saved));
         }
+    },
+    
+    // Сохранение на сервер
+    saveToServer() {
+        // В демо-версии сохраняем только в localStorage
+        console.log('User saved to localStorage');
     },
     
     // Выход
     logout() {
         if (confirm('Вы уверены, что хотите выйти?')) {
-            // Очищаем только пользовательские данные
-            localStorage.removeItem('hotwheels_user_encrypted');
+            localStorage.removeItem('hotwheels_user');
             this.user = null;
             
             document.getElementById('app-screen').classList.remove('active');
@@ -1548,12 +1111,12 @@ function saveProfile() {
     const cityInput = document.getElementById('edit-city');
     
     if (App.user) {
-        App.user.first_name = nameInput.value || 'Пользователь';
+        App.user.first_name = nameInput.value;
         App.user.telegram = usernameInput.value;
         App.user.city = cityInput.value;
-        App.user.avatar = App.user.first_name[0] || 'П';
+        App.user.avatar = App.user.first_name?.[0] || '?';
         
-        App.saveUser();
+        localStorage.setItem('hotwheels_user', JSON.stringify(App.user));
         App.updateProfile();
         
         // Обновляем аватар в шапке
@@ -1567,7 +1130,28 @@ function logout() {
     App.logout();
 }
 
+// Обработка хэша в URL для прямых ссылок на товары
+function handleUrlHash() {
+    const hash = window.location.hash;
+    if (hash.startsWith('#product=')) {
+        const productId = parseInt(hash.split('=')[1]);
+        if (productId) {
+            // Ждем загрузки приложения
+            setTimeout(() => {
+                const product = App.products.find(p => p.id === productId);
+                if (product) {
+                    App.showProduct(productId);
+                }
+            }, 500);
+        }
+    }
+}
+
 // Запуск приложения при загрузке
 document.addEventListener('DOMContentLoaded', () => {
     App.init();
+    handleUrlHash();
+    
+    // Слушаем изменения хэша
+    window.addEventListener('hashchange', handleUrlHash);
 });
