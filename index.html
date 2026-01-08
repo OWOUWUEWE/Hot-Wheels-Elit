@@ -17,35 +17,18 @@
             </div>
             
             <div class="auth-card">
-                <h2>Добро пожаловать!</h2>
-                <p>Крупнейшее сообщество коллекционеров Hot Wheels</p>
+                <h2>Вход через Telegram</h2>
+                <p>Для использования приложения войдите через свой Telegram аккаунт</p>
                 
-                <div class="auth-options">
-                    <button id="demo-login-btn" class="auth-option-btn" onclick="App.loginAsGuest()">
-                        <div class="auth-option-icon">🚀</div>
-                        <div class="auth-option-text">
-                            <div class="auth-option-title">Быстрый старт</div>
-                            <div class="auth-option-desc">Начать без регистрации</div>
-                        </div>
-                    </button>
-                    
-                    <button id="tg-login-btn" class="auth-option-btn telegram" onclick="App.loginWithTelegram()">
-                        <div class="auth-option-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.141c-.174-.807-.996-1.384-1.768-1.188-3.037.585-6.217.88-9.474.979-.388.019-.695.312-.715.701-.02.389.274.718.662.737 3.182.098 6.287.386 9.251.954.164.032.332-.024.45-.147.119-.123.174-.296.147-.462-.155-.695-.306-1.39-.453-2.086zm-.674 2.1c-.723.173-1.456.328-2.196.465-.364.068-.712-.183-.78-.547-.068-.364.183-.712.547-.78.731-.137 1.455-.291 2.171-.463.374-.089.758.13.847.504.089.374-.13.758-.504.847-.073.017-.147.025-.22.025-.303 0-.58-.205-.665-.511z"/>
-                            </svg>
-                        </div>
-                        <div class="auth-option-text">
-                            <div class="auth-option-title">Войти через Telegram</div>
-                            <div class="auth-option-desc">Рекомендуется для полного доступа</div>
-                        </div>
-                    </button>
-                </div>
+                <button id="tg-login-btn" class="tg-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                        <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.141c-.174-.807-.996-1.384-1.768-1.188-3.037.585-6.217.88-9.474.979-.388.019-.695.312-.715.701-.02.389.274.718.662.737 3.182.098 6.287.386 9.251.954.164.032.332-.024.45-.147.119-.123.174-.296.147-.462-.155-.695-.306-1.39-.453-2.086zm-.674 2.1c-.723.173-1.456.328-2.196.465-.364.068-.712-.183-.78-.547-.068-.364.183-.712.547-.78.731-.137 1.455-.291 2.171-.463.374-.089.758.13.847.504.089.374-.13.758-.504.847-.073.017-.147.025-.22.025-.303 0-.58-.205-.665-.511z"/>
+                    </svg>
+                    Войти через Telegram
+                </button>
                 
-                <div class="auth-note">
-                    <p>✅ Все данные сохраняются локально в вашем браузере</p>
-                    <p>✅ Товары видны всем пользователям сайта</p>
-                    <p>✅ Работает на любом устройстве</p>
+                <div class="auth-hint">
+                    <a href="#" onclick="App.showDemo()">Попробовать демо-версию</a>
                 </div>
             </div>
         </div>
@@ -104,7 +87,7 @@
                             </div>
                         </div>
                         <input type="file" id="photo-input" accept="image/*" multiple style="display: none;">
-                        <div class="upload-hint">Фото сохраняются локально</div>
+                        <div class="upload-hint">Файлы сохраняются в браузере</div>
                     </div>
 
                     <!-- Основная информация -->
@@ -169,7 +152,7 @@
                     
                     <div class="sell-note">
                         * — обязательные поля<br>
-                        Ваше объявление увидят все пользователи сайта
+                        После публикации объявление появится в общем каталоге.
                     </div>
                 </div>
             </div>
@@ -189,7 +172,7 @@
                 <div class="profile-header">
                     <div id="profile-avatar" class="big-avatar">?</div>
                     <div class="profile-info">
-                        <h3 id="profile-name">Гость</h3>
+                        <h3 id="profile-name">Пользователь</h3>
                         <div class="profile-stats">
                             <div class="stat">
                                 <div class="stat-number" id="active-count">0</div>
@@ -200,8 +183,8 @@
                                 <div class="stat-label">Продано</div>
                             </div>
                             <div class="stat">
-                                <div class="stat-number" id="reviews-count">0</div>
-                                <div class="stat-label">Отзывы</div>
+                                <div class="stat-number" id="total-count">0</div>
+                                <div class="stat-label">Всего</div>
                             </div>
                         </div>
                     </div>
@@ -212,22 +195,6 @@
                     <h4>Мои объявления</h4>
                     <div id="my-products" class="products-list">
                         <!-- Товары пользователя -->
-                    </div>
-                </div>
-
-                <!-- Мои отзывы -->
-                <div class="profile-section">
-                    <h4>Мои отзывы</h4>
-                    <div id="my-reviews" class="reviews-list">
-                        <!-- Отзывы пользователя -->
-                    </div>
-                </div>
-
-                <!-- Полученные отзывы -->
-                <div class="profile-section">
-                    <h4>Полученные отзывы</h4>
-                    <div id="received-reviews" class="reviews-list">
-                        <!-- Отзывы от других пользователей -->
                     </div>
                 </div>
 
@@ -289,6 +256,7 @@
                     
                     <div class="product-share">
                         <button class="btn-share" onclick="App.shareProduct()">🔗 Поделиться ссылкой</button>
+                        <input type="text" id="product-link" readonly style="display: none;">
                     </div>
                     
                     <div class="product-seller">
@@ -297,57 +265,19 @@
                             <div class="seller-name" id="modal-seller-name"></div>
                             <div class="seller-city" id="modal-seller-city"></div>
                             <div class="seller-telegram" id="modal-seller-telegram"></div>
-                            <div class="seller-rating">
-                                Рейтинг: <span id="modal-seller-rating">0.0</span> ★
-                                (<span id="modal-seller-reviews-count">0</span> отзывов)
-                            </div>
                         </div>
                     </div>
                     
                     <div class="product-actions">
                         <button class="btn-contact" onclick="App.contactSeller()">📞 Связаться</button>
-                        <button class="btn-favorite" id="modal-favorite-btn" onclick="App.toggleFavorite()">🤍 В избранное</button>
+                        <button class="btn-favorite" id="modal-favorite-btn" onclick="App.toggleFavorite()">❤️ В избранное</button>
                         <div class="owner-actions" id="owner-actions" style="display: none;">
                             <button class="btn-edit" onclick="App.editProduct()">✏️ Редактировать</button>
                             <button class="btn-delete" onclick="App.deleteProduct()">🗑️ Удалить</button>
                         </div>
                     </div>
-                    
-                    <!-- Отзывы о продавце -->
-                    <div class="seller-reviews-section" id="seller-reviews-section" style="display: none;">
-                        <h4>Отзывы о продавце</h4>
-                        <div id="seller-reviews-list"></div>
-                        <button class="btn-add-review" id="btn-add-review" onclick="App.showReviewForm()">➕ Оставить отзыв</button>
-                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Попап отзыва -->
-    <div id="review-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Оставить отзыв</h3>
-                <span class="close-modal" onclick="App.closeReviewModal()">×</span>
-            </div>
-            <input type="hidden" id="review-seller-id">
-            <input type="hidden" id="review-seller-name">
-            
-            <div class="rating-selector">
-                <h4>Оценка:</h4>
-                <div class="stars" id="review-stars">
-                    <span class="star" data-rating="1">☆</span>
-                    <span class="star" data-rating="2">☆</span>
-                    <span class="star" data-rating="3">☆</span>
-                    <span class="star" data-rating="4">☆</span>
-                    <span class="star" data-rating="5">☆</span>
-                </div>
-                <div class="rating-text" id="rating-text">Выберите оценку</div>
-            </div>
-            
-            <textarea id="review-text" placeholder="Расскажите о вашем опыте покупки..." class="form-textarea"></textarea>
-            <button class="btn-primary" onclick="App.submitReview()">📝 Отправить отзыв</button>
         </div>
     </div>
 
